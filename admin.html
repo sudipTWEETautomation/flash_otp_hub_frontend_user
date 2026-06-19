@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flash OTP Hub — Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f4;color:#111;font-size:14px}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:210px;flex-shrink:0;background:#fff;border-right:1px solid #e5e5e5;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
+.logo{padding:16px;border-bottom:1px solid #e5e5e5}
+.logo-name{font-size:14px;font-weight:700;letter-spacing:.3px}
+.logo-sub{font-size:11px;color:#999;margin-top:2px}
+.nav{flex:1;padding:6px 0}
+.nav-section{font-size:10px;font-weight:600;color:#bbb;text-transform:uppercase;letter-spacing:.6px;padding:10px 16px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:13px;color:#555;cursor:pointer;border-left:2px solid transparent;transition:all .1s}
+.nav-item:hover{color:#111;background:#f7f7f7}
+.nav-item.active{color:#111;border-left-color:#111;background:#f4f4f4;font-weight:600}
+.nav-item i{font-size:16px;flex-shrink:0}
+.sidebar-foot{padding:12px 16px;border-top:1px solid #e5e5e5;font-size:11px;color:#bbb}
+.main{margin-left:210px;flex:1}
+.topbar{background:#fff;border-bottom:1px solid #e5e5e5;padding:11px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar h1{font-size:15px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.live-pill{display:flex;align-items:center;gap:5px;font-size:11px;color:#555;background:#f0f0f0;padding:4px 10px;border-radius:20px}
+.dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0}
+.content{padding:20px 24px}
+.section{display:none}.section.active{display:block}
+
+/* BADGES */
+.badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;display:inline-block;white-space:nowrap}
+.b-green{background:#dcfce7;color:#166534}
+.b-yellow{background:#fef9c3;color:#854d0e}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-gray{background:#f3f4f6;color:#6b7280}
+.b-blue{background:#dbeafe;color:#1e40af}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.metric{background:#fff;border:1px solid #e5e5e5;border-radius:10px;padding:14px 16px}
+.metric label{font-size:10px;color:#999;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.metric .val{font-size:22px;font-weight:700}
+.metric .sub{font-size:11px;color:#bbb;margin-top:3px}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:10px;margin-bottom:14px;overflow:hidden}
+.card-head{padding:11px 14px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;background:#fafafa}
+.card-head h2{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#555}
+.card-body{padding:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:10px;font-weight:700;color:#999;padding:8px 11px;border-bottom:1px solid #f0f0f0;text-transform:uppercase;letter-spacing:.4px;background:#fafafa;white-space:nowrap}
+td{padding:9px 11px;border-bottom:1px solid #f7f7f7;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+
+/* BUTTONS */
+.btn{font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#111;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .1s;white-space:nowrap}
+.btn:hover{background:#f5f5f5}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{font-size:11px;padding:4px 8px}
+.btn-xs{font-size:10px;padding:2px 6px}
+.btn-success{border-color:#86efac;color:#166534}.btn-success:hover{background:#dcfce7}
+.btn-danger{border-color:#fca5a5;color:#991b1b}.btn-danger:hover{background:#fee2e2}
+.btn-primary{background:#111;color:#fff;border-color:#111}.btn-primary:hover{background:#333}
+.btn-warn{border-color:#fcd34d;color:#854d0e}.btn-warn:hover{background:#fef9c3}
+
+/* FORMS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.fg label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.fg input,.fg select,.fg textarea{font-size:13px;font-family:inherit;padding:7px 10px;border:1px solid #e5e5e5;border-radius:6px;background:#fff;color:#111;outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#111}
+.fg textarea{resize:vertical;min-height:60px}
+
+/* OPERATOR PRICE ROWS */
+.op-price-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.op-price-row select{flex:1.4;font-size:12px;font-family:inherit;padding:6px 8px;border:1px solid #e5e5e5;border-radius:6px;background:#fff;color:#111;outline:none}
+.op-price-row select:focus{border-color:#111}
+.op-price-row input{flex:1;font-size:12px;font-family:inherit;padding:6px 8px;border:1px solid #e5e5e5;border-radius:6px;background:#fff;color:#111;outline:none}
+.op-price-row input:focus{border-color:#111}
+.op-price-row .btn{flex-shrink:0}
+
+/* ACTION BAR */
+.abar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.abar input,.abar select{font-size:12px;font-family:inherit;padding:6px 10px;border:1px solid #e5e5e5;border-radius:6px;background:#fff;outline:none;height:32px}
+.abar input:focus,.abar select:focus{border-color:#111}
+.abar input[type=text]{min-width:180px}
+
+/* TOGGLE */
+.tgl{width:36px;height:20px;background:#d1d5db;border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;display:inline-block}
+.tgl.on{background:#111}
+.tgl::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tgl.on::after{left:19px}
+
+/* AVATAR */
+.av{width:28px;height:28px;border-radius:50%;background:#e5e5e5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+
+/* MISC */
+.mono{font-family:'SF Mono',monospace;font-size:11px;color:#888}
+.profit{color:#166534;font-weight:600}
+.sep{height:1px;background:#f0f0f0;margin:12px 0}
+.pager{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#999;margin-top:8px}
+.loading{text-align:center;padding:30px;color:#bbb;font-size:12px}
+.empty{text-align:center;padding:30px;color:#bbb;font-size:12px}
+.err-msg{background:#fee2e2;color:#991b1b;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:10px}
+.ok-msg{background:#dcfce7;color:#166534;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:10px}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:12px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.modal-head{padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700}
+.modal-body{padding:16px}
+.modal-foot{padding:10px 16px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:8px}
+
+/* LOGIN SCREEN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4f4f4}
+.login-box{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:32px;width:360px}
+.login-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.login-sub{font-size:12px;color:#999;margin-bottom:24px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page" class="login-wrap">
+  <div class="login-box">
+    <div class="login-title">⚡ Flash OTP Hub</div>
+    <div class="login-sub">Admin Panel — Sign in</div>
+    <div id="login-err" style="display:none" class="err-msg"></div>
+    <div class="fg"><label>Email</label><input id="l-email" type="email" placeholder="admin@email.com"></div>
+    <div class="fg"><label>Password</label><input id="l-pass" type="password" placeholder="••••••"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px" id="login-btn" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div id="admin-shell" class="shell" style="display:none">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-name">⚡ Flash OTP Hub</div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" data-sec="dashboard"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="nav-section">Manage</div>
+      <div class="nav-item" data-sec="users"><i class="ti ti-users"></i>Users</div>
+      <div class="nav-item" data-sec="orders"><i class="ti ti-receipt"></i>Orders</div>
+      <div class="nav-item" data-sec="payments"><i class="ti ti-credit-card"></i>Payments</div>
+      <div class="nav-item" data-sec="transactions"><i class="ti ti-arrows-exchange"></i>Transactions</div>
+      <div class="nav-section">Content</div>
+      <div class="nav-item" data-sec="services"><i class="ti ti-apps"></i>Services</div>
+      <div class="nav-item" data-sec="redeem"><i class="ti ti-ticket"></i>Redeem codes</div>
+      <div class="nav-item" data-sec="banners"><i class="ti ti-photo"></i>Banners</div>
+      <div class="nav-section">System</div>
+      <div class="nav-item" data-sec="settings"><i class="ti ti-settings"></i>Settings</div>
+      <div class="nav-item" data-sec="provider"><i class="ti ti-server"></i>Provider</div>
+    </nav>
+    <div class="sidebar-foot" id="sb-user">—</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="page-title">Dashboard</h1>
+      <div class="topbar-right">
+        <div class="live-pill"><div class="dot"></div><span id="provider-label">Lumera SMS</span></div>
+        <button class="btn btn-sm btn-danger" onclick="logout()"><i class="ti ti-logout"></i> Logout</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="section active" id="section-dashboard">
+        <div class="metrics" id="dash-metrics">
+          <div class="metric"><label>Total users</label><div class="val" id="d-users">—</div></div>
+          <div class="metric"><label>Today's orders</label><div class="val" id="d-todayord">—</div><div class="sub" id="d-pendord">— pending</div></div>
+          <div class="metric"><label>Today's revenue</label><div class="val" id="d-todayrev">—</div><div class="sub" id="d-todayprofit">profit —</div></div>
+          <div class="metric"><label>Pending recharges</label><div class="val" id="d-pendrc">—</div></div>
+        </div>
+        <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+          <div class="metric"><label>Total revenue</label><div class="val" id="d-totrev">—</div></div>
+          <div class="metric"><label>Total profit</label><div class="val" id="d-totprofit">—</div></div>
+          <div class="metric"><label>Numbers in use</label><div class="val" id="d-nums">—</div></div>
+          <div class="metric"><label>Active banners</label><div class="val" id="d-banners">—</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head"><h2>Recent orders</h2><button class="btn btn-sm" onclick="switchSec('orders')">View all →</button></div>
+            <div id="dash-orders"><div class="loading">Loading…</div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Pending recharges</h2><button class="btn btn-sm" onclick="switchSec('payments')">View all →</button></div>
+            <div id="dash-recharges"><div class="loading">Loading…</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== USERS ===== -->
+      <div class="section" id="section-users">
+        <div class="abar">
+          <input type="text" id="user-q" placeholder="Search email or name…" onkeydown="if(event.key==='Enter')loadUsers()">
+          <button class="btn" onclick="loadUsers()"><i class="ti ti-search"></i></button>
+          <button class="btn btn-primary" style="margin-left:auto" onclick="openCreditModal()"><i class="ti ti-plus"></i> Add / remove balance</button>
+        </div>
+        <div class="card">
+          <div id="users-table"><div class="loading">Loading…</div></div>
+        </div>
+        <div class="pager">
+          <span id="users-info">—</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" id="users-prev" onclick="loadUsers(usersPage-1)">← Prev</button>
+            <button class="btn btn-sm" id="users-next" onclick="loadUsers(usersPage+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ORDERS ===== -->
+      <div class="section" id="section-orders">
+        <div class="abar">
+          <select id="ord-status" onchange="loadOrders()">
+            <option value="">All statuses</option>
+            <option>pending</option><option>success</option><option>cancelled</option><option>expired</option>
+          </select>
+          <button class="btn" onclick="loadOrders()"><i class="ti ti-refresh"></i> Refresh</button>
+        </div>
+        <div class="card">
+          <div id="orders-table"><div class="loading">Loading…</div></div>
+        </div>
+        <div class="pager">
+          <span id="orders-info">—</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" id="orders-prev" onclick="loadOrders(ordersPage-1)">← Prev</button>
+            <button class="btn btn-sm" id="orders-next" onclick="loadOrders(ordersPage+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAYMENTS ===== -->
+      <div class="section" id="section-payments">
+        <div class="abar">
+          <select id="pay-status" onchange="loadPayments()">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="">All</option>
+          </select>
+          <button class="btn" onclick="loadPayments()"><i class="ti ti-refresh"></i> Refresh</button>
+        </div>
+        <div class="card">
+          <div id="payments-table"><div class="loading">Loading…</div></div>
+        </div>
+        <div class="pager">
+          <span id="pay-info">—</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" id="pay-prev" onclick="loadPayments(payPage-1)">← Prev</button>
+            <button class="btn btn-sm" id="pay-next" onclick="loadPayments(payPage+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TRANSACTIONS ===== -->
+      <div class="section" id="section-transactions">
+        <div class="abar">
+          <select id="tx-type" onchange="loadTx()">
+            <option value="">All types</option>
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
+          </select>
+          <button class="btn" onclick="loadTx()"><i class="ti ti-refresh"></i> Refresh</button>
+        </div>
+        <div class="card">
+          <div id="tx-table"><div class="loading">Loading…</div></div>
+        </div>
+        <div class="pager">
+          <span id="tx-info">—</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" id="tx-prev" onclick="loadTx(txPage-1)">← Prev</button>
+            <button class="btn btn-sm" id="tx-next" onclick="loadTx(txPage+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SERVICES ===== -->
+      <div class="section" id="section-services">
+        <div class="abar">
+          <button class="btn btn-primary" onclick="openSvcModal()"><i class="ti ti-plus"></i> Add service</button>
+          <button class="btn" onclick="loadServices()"><i class="ti ti-refresh"></i> Refresh</button>
+        </div>
+        <div class="card">
+          <div id="services-table"><div class="loading">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ===== REDEEM CODES ===== -->
+      <div class="section" id="section-redeem">
+        <div class="abar">
+          <button class="btn btn-primary" onclick="openRedeemModal()"><i class="ti ti-plus"></i> Generate codes</button>
+          <button class="btn" onclick="loadRedeem()"><i class="ti ti-refresh"></i> Refresh</button>
+        </div>
+        <div class="card">
+          <div id="redeem-table"><div class="loading">Loading…</div></div>
+        </div>
+        <div class="pager">
+          <span id="redeem-info">—</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="loadRedeem(redeemPage-1)">← Prev</button>
+            <button class="btn btn-sm" onclick="loadRedeem(redeemPage+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BANNERS ===== -->
+      <div class="section" id="section-banners">
+        <div class="abar">
+          <button class="btn btn-primary" onclick="openBannerModal()"><i class="ti ti-plus"></i> Add banner</button>
+          <button class="btn" onclick="loadBanners()"><i class="ti ti-refresh"></i> Refresh</button>
+        </div>
+        <div class="card">
+          <div id="banners-table"><div class="loading">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ===== SETTINGS ===== -->
+      <div class="section" id="section-settings">
+        <div id="settings-msg"></div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-head"><h2>Referral</h2></div>
+            <div class="card-body">
+              <div class="fg"><label>Referral reward (₹)</label><input type="number" id="s-refer-reward" step="0.01"></div>
+              <div class="fg"><label>Min recharge to trigger (₹)</label><input type="number" id="s-refer-min" step="0.01"></div>
+              <button class="btn btn-primary" onclick="saveSettings('referral')">Save</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Multi-OTP pricing</h2></div>
+            <div class="card-body">
+              <div style="font-size:10px;color:#999;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;font-weight:600">Extra charge per additional OTP request</div>
+              <div class="form-row">
+                <div class="fg"><label>2nd OTP (₹)</label><input type="number" id="s-otp2" step="0.01"></div>
+                <div class="fg"><label>3rd OTP (₹)</label><input type="number" id="s-otp3" step="0.01"></div>
+              </div>
+              <div class="form-row">
+                <div class="fg"><label>4th OTP (₹)</label><input type="number" id="s-otp4" step="0.01"></div>
+                <div class="fg"><label>5th OTP (₹)</label><input type="number" id="s-otp5" step="0.01"></div>
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings('otp')">Save</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Maintenance mode</h2></div>
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:12px;font-size:13px;margin-bottom:14px">
+                <div class="tgl" id="maint-tgl" onclick="toggleMaint()"></div>
+                <span id="maint-label">Off</span>
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings('maint')">Save</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>System info</h2></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:#666;line-height:2.2">
+                <div>Backend: <span style="color:#111;font-weight:600">flash-lumera.onrender.com</span></div>
+                <div>Provider: <span style="color:#111;font-weight:600">Lumera SMS</span></div>
+                <div>Number validity: <span style="color:#111;font-weight:600">10 min</span></div>
+                <div>Cancel delay: <span style="color:#111;font-weight:600">60 sec</span></div>
+                <div>Rate limit: <span style="color:#111;font-weight:600">30 req/sec</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PROVIDER ===== -->
+      <div class="section" id="section-provider">
+        <div class="card" style="max-width:480px">
+          <div class="card-head"><h2>Lumera SMS balance</h2><button class="btn btn-sm" onclick="loadProviderBalance()"><i class="ti ti-refresh"></i> Check</button></div>
+          <div class="card-body" id="provider-body"><div class="loading">Click refresh to check balance</div></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ===== MODALS ===== -->
+<div id="modal-bg" class="modal-bg" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-box">
+    <div class="modal-head"><span id="modal-title">Modal</span><button class="btn btn-sm" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<script>
+const BASE = 'https://flash-lumera.onrender.com';
+let TOKEN = localStorage.getItem('foh_admin_token') || '';
+let usersPage=1, ordersPage=1, payPage=1, txPage=1, redeemPage=1;
+let maintState = false;
+const OPERATORS = [
+  {name:'Operator-1 Multi-SMS', code:'1'},
+  {name:'Operator-2', code:'2'},
+  {name:'Operator-3', code:'3'},
+  {name:'Operator-4', code:'4'},
+  {name:'Operator-5', code:'5'},
+  {name:'Operator-6', code:'6'},
+  {name:'Operator-7', code:'7'},
+  {name:'Operator-8', code:'8'},
+  {name:'Operator-9', code:'9'},
+  {name:'Operator-10', code:'10'},
+  {name:'Operator-11', code:'11'},
+  {name:'Operator-12', code:'12'},
+  {name:'Operator-13 (Multi SMS)', code:'13'},
+  {name:'Operator-14', code:'14'},
+  {name:'Operator-15', code:'15'},
+];
+
+// ── API ──────────────────────────────────────────────
+async function api(method, path, body=null, isForm=false){
+  const opts = {
+    method,
+    headers:{'Authorization':'Bearer '+TOKEN}
+  };
+  if(body && isForm){ opts.body = body; }
+  else if(body){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
+  const r = await fetch(BASE+path, opts);
+  const data = await r.json().catch(()=>({error:'Parse error'}));
+  return {ok: r.ok, status: r.status, data};
+}
+
+// ── AUTH ─────────────────────────────────────────────
+async function doLogin(){
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-err');
+  err.style.display='none';
+  btn.disabled=true; btn.textContent='Signing in…';
+  const r = await fetch(BASE+'/api/auth/login',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email,password:pass})
+  });
+  const d = await r.json().catch(()=>({}));
+  btn.disabled=false; btn.textContent='Sign in';
+  if(!r.ok || !d.access_token){ err.textContent=d.error||'Login failed'; err.style.display='block'; return; }
+  if(!d.user?.is_admin){ err.textContent='Not an admin account'; err.style.display='block'; return; }
+  TOKEN = d.access_token;
+  localStorage.setItem('foh_admin_token', TOKEN);
+  document.getElementById('sb-user').textContent = d.user.email;
+  showAdmin();
+}
+
+function logout(){
+  TOKEN=''; localStorage.removeItem('foh_admin_token');
+  location.reload();
+}
+
+function showAdmin(){
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('admin-shell').style.display='flex';
+  loadDashboard();
+}
+
+// ── NAV ──────────────────────────────────────────────
+const secLoaders = {
+  dashboard: loadDashboard,
+  users: loadUsers,
+  orders: loadOrders,
+  payments: loadPayments,
+  transactions: loadTx,
+  services: loadServices,
+  redeem: loadRedeem,
+  banners: loadBanners,
+  settings: loadSettings,
+  provider: ()=>{}
+};
+
+function switchSec(name){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.sec===name));
+  document.querySelectorAll('.section').forEach(el=>el.classList.toggle('active',el.id==='section-'+name));
+  const titles={dashboard:'Dashboard',users:'Users',orders:'Orders',payments:'Payments',transactions:'Transactions',services:'Services',redeem:'Redeem codes',banners:'Banners',settings:'Settings',provider:'Provider'};
+  document.getElementById('page-title').textContent = titles[name]||name;
+  if(secLoaders[name]) secLoaders[name]();
+}
+document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>switchSec(el.dataset.sec)));
+
+// ── UTILS ─────────────────────────────────────────────
+const fmt = n => n==null?'—':'₹'+parseFloat(n).toFixed(2);
+const fmtN = n => n==null?'—':n.toLocaleString();
+function ago(s){ if(!s)return'—'; const d=new Date(s); const diff=(Date.now()-d)/1000; if(diff<60)return Math.floor(diff)+'s ago'; if(diff<3600)return Math.floor(diff/60)+'m ago'; if(diff<86400)return Math.floor(diff/3600)+'h ago'; return d.toLocaleDateString('en-IN'); }
+function statusBadge(s){ const m={success:'b-green',pending:'b-yellow',expired:'b-red',cancelled:'b-gray',approved:'b-green',rejected:'b-red',active:'b-green',inactive:'b-gray',credit:'b-green',debit:'b-red'}; return `<span class="badge ${m[s]||'b-gray'}">${s}</span>`; }
+function av(name){ return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function showMsg(elId, msg, ok=true){ const el=document.getElementById(elId); if(!el)return; el.innerHTML=`<div class="${ok?'ok-msg':'err-msg'}">${msg}</div>`; setTimeout(()=>el.innerHTML='',4000); }
+
+// ── DASHBOARD ─────────────────────────────────────────
+async function loadDashboard(){
+  const r = await api('GET','/api/admin/dashboard');
+  if(!r.ok){ console.error(r.data); return; }
+  const d = r.data;
+  document.getElementById('d-users').textContent = fmtN(d.total_users);
+  document.getElementById('d-todayord').textContent = fmtN(d.today_orders);
+  document.getElementById('d-pendord').textContent = fmtN(d.pending_orders)+' pending';
+  document.getElementById('d-todayrev').textContent = fmt(d.today_revenue);
+  document.getElementById('d-todayprofit').textContent = 'profit '+fmt(d.today_profit);
+  document.getElementById('d-pendrc').textContent = fmtN(d.pending_recharge);
+  document.getElementById('d-totrev').textContent = fmt(d.total_revenue);
+  document.getElementById('d-totprofit').textContent = fmt(d.total_profit);
+  document.getElementById('d-nums').textContent = fmtN(d.numbers_in_use);
+  document.getElementById('d-banners').textContent = fmtN(d.active_banners);
+
+  // Recent orders table
+  const orders = d.recent_orders||[];
+  document.getElementById('dash-orders').innerHTML = orders.length ? `
+    <table><thead><tr><th>Service</th><th>Number</th><th>Price</th><th>Status</th><th>When</th></tr></thead>
+    <tbody>${orders.map(o=>`<tr>
+      <td>${o.service_name||'—'}</td>
+      <td class="mono">${o.number||'—'}</td>
+      <td>${fmt(o.price)}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td style="color:#bbb;font-size:11px">${ago(o.created_at)}</td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No orders</div>';
+
+  // Recent recharges
+  const reqs = d.recent_recharges||[];
+  document.getElementById('dash-recharges').innerHTML = reqs.length ? `
+    <table><thead><tr><th>User</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${reqs.map(r=>`<tr>
+      <td style="font-size:11px">${r.user_email||r.user_id}</td>
+      <td>${fmt(r.amount)}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>${r.status==='pending'?`<button class="btn btn-xs btn-success" onclick="quickApprove('${r._id}')">Approve</button> <button class="btn btn-xs btn-danger" onclick="quickReject('${r._id}')">Reject</button>`:'—'}</td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No pending recharges</div>';
+}
+
+async function quickApprove(id){ await api('POST',`/api/admin/recharge-requests/${id}/approve`); loadDashboard(); }
+async function quickReject(id){ await api('POST',`/api/admin/recharge-requests/${id}/reject`,{reason:''}); loadDashboard(); }
+
+// ── USERS ─────────────────────────────────────────────
+async function loadUsers(page=1){
+  usersPage=page;
+  const q = document.getElementById('user-q').value.trim();
+  const r = await api('GET',`/api/admin/users?page=${page}&limit=20&q=${encodeURIComponent(q)}`);
+  if(!r.ok){ document.getElementById('users-table').innerHTML=`<div class="empty">Error loading users</div>`; return; }
+  const {users,total} = r.data;
+  document.getElementById('users-info').textContent = `Showing ${(page-1)*20+1}–${Math.min(page*20,total)} of ${total}`;
+  document.getElementById('users-prev').disabled = page<=1;
+  document.getElementById('users-next').disabled = page*20>=total;
+  document.getElementById('users-table').innerHTML = users.length ? `
+    <table><thead><tr><th></th><th>Name / Email</th><th>Wallet</th><th>Refers</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${users.map(u=>`<tr>
+      <td><div class="av">${av(u.name)}</div></td>
+      <td><div style="font-weight:600;font-size:12px">${u.name||'—'}</div><div class="mono">${u.email}</div></td>
+      <td>${fmt(u.wallet_balance)}</td>
+      <td>${u.total_referred||0}</td>
+      <td style="color:#bbb;font-size:11px">${ago(u.created_at)}</td>
+      <td>${u.is_admin?'<span class="badge b-blue">admin</span> ':''} ${statusBadge(u.is_banned?'banned':'active')}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        ${u.is_banned
+          ? `<button class="btn btn-xs btn-success" onclick="banUser('${u._id}',false)">Unban</button>`
+          : `<button class="btn btn-xs btn-danger" onclick="banUser('${u._id}',true)">Ban</button>`}
+        <button class="btn btn-xs" onclick="openCreditModal('${u._id}','${u.name}')"><i class="ti ti-wallet"></i></button>
+        <button class="btn btn-xs" onclick="openTxModal('${u._id}','${u.name}')"><i class="ti ti-list"></i></button>
+      </td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No users found</div>';
+}
+
+async function banUser(uid, ban){
+  const r = await api('POST',`/api/admin/users/${uid}/ban`,{ban});
+  if(r.ok) loadUsers(usersPage); else alert(r.data.error||'Error');
+}
+
+// ── ORDERS ────────────────────────────────────────────
+async function loadOrders(page=1){
+  ordersPage=page;
+  const status = document.getElementById('ord-status').value;
+  const r = await api('GET',`/api/admin/orders?page=${page}&limit=30${status?'&status='+status:''}`);
+  if(!r.ok){ document.getElementById('orders-table').innerHTML='<div class="empty">Error</div>'; return; }
+  const {orders,total} = r.data;
+  document.getElementById('orders-info').textContent = `${(page-1)*30+1}–${Math.min(page*30,total)} of ${total}`;
+  document.getElementById('orders-prev').disabled = page<=1;
+  document.getElementById('orders-next').disabled = page*30>=total;
+  document.getElementById('orders-table').innerHTML = orders.length ? `
+    <table><thead><tr><th>Activation ID</th><th>User</th><th>Service</th><th>Number</th><th>Price</th><th>OTPs</th><th>Status</th><th>Created</th></tr></thead>
+    <tbody>${orders.map(o=>`<tr>
+      <td class="mono">${o.api_activation_id||o._id}</td>
+      <td class="mono" style="font-size:10px">${o.user_id}</td>
+      <td>${o.service_name||'—'}</td>
+      <td class="mono">${o.number||'—'}</td>
+      <td>${fmt(o.price)}</td>
+      <td>${o.otp_count||0}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td style="color:#bbb;font-size:11px">${ago(o.created_at)}</td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No orders</div>';
+}
+
+// ── PAYMENTS ──────────────────────────────────────────
+async function loadPayments(page=1){
+  payPage=page;
+  const status = document.getElementById('pay-status').value;
+  const r = await api('GET',`/api/admin/recharge-requests?status=${status}&page=${page}&limit=20`);
+  if(!r.ok){ document.getElementById('payments-table').innerHTML='<div class="empty">Error</div>'; return; }
+  const {requests,total} = r.data;
+  document.getElementById('pay-info').textContent = `${(page-1)*20+1}–${Math.min(page*20,total)} of ${total}`;
+  document.getElementById('pay-prev').disabled = page<=1;
+  document.getElementById('pay-next').disabled = page*20>=total;
+  document.getElementById('payments-table').innerHTML = requests.length ? `
+    <table><thead><tr><th>User</th><th>Amount</th><th>Screenshot</th><th>Status</th><th>When</th><th>Actions</th></tr></thead>
+    <tbody>${requests.map(req=>`<tr>
+      <td><div style="font-weight:600;font-size:12px">${req.user_name||'—'}</div><div class="mono">${req.user_email||req.user_id}</div></td>
+      <td>${fmt(req.amount)}</td>
+      <td>${req.screenshot_url?`<a href="${req.screenshot_url}" target="_blank" class="btn btn-xs"><i class="ti ti-photo"></i> View</a>`:'—'}</td>
+      <td>${statusBadge(req.status)}</td>
+      <td style="color:#bbb;font-size:11px">${ago(req.created_at)}</td>
+      <td style="display:flex;gap:4px">
+        ${req.status==='pending'?`
+          <button class="btn btn-xs btn-success" onclick="approveRecharge('${req._id}')">Approve</button>
+          <button class="btn btn-xs btn-danger" onclick="openRejectModal('${req._id}')">Reject</button>`:'—'}
+      </td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No requests</div>';
+}
+
+async function approveRecharge(id){
+  if(!confirm('Approve this recharge?')) return;
+  const r = await api('POST',`/api/admin/recharge-requests/${id}/approve`);
+  if(r.ok) loadPayments(payPage); else alert(r.data.error||'Error');
+}
+
+function openRejectModal(id){
+  openModal('Reject recharge',
+    `<div class="fg"><label>Reason (optional)</label><input id="rej-reason" type="text" placeholder="Invalid screenshot…"></div>`,
+    `<button class="btn btn-danger" onclick="rejectRecharge('${id}')">Reject</button><button class="btn" onclick="closeModal()">Cancel</button>`
+  );
+}
+async function rejectRecharge(id){
+  const reason = document.getElementById('rej-reason').value;
+  const r = await api('POST',`/api/admin/recharge-requests/${id}/reject`,{reason});
+  if(r.ok){ closeModal(); loadPayments(payPage); } else alert(r.data.error||'Error');
+}
+
+// ── TRANSACTIONS ──────────────────────────────────────
+async function loadTx(page=1){
+  txPage=page;
+  const type = document.getElementById('tx-type').value;
+  const r = await api('GET',`/api/admin/transactions?page=${page}&limit=50${type?'&type='+type:''}`);
+  if(!r.ok){ document.getElementById('tx-table').innerHTML='<div class="empty">Error</div>'; return; }
+  const {transactions,total} = r.data;
+  document.getElementById('tx-info').textContent = `${(page-1)*50+1}–${Math.min(page*50,total)} of ${total}`;
+  document.getElementById('tx-prev').disabled = page<=1;
+  document.getElementById('tx-next').disabled = page*50>=total;
+  document.getElementById('tx-table').innerHTML = transactions.length ? `
+    <table><thead><tr><th>User</th><th>Type</th><th>Amount</th><th>Description</th><th>When</th></tr></thead>
+    <tbody>${transactions.map(tx=>`<tr>
+      <td><div style="font-size:12px">${tx.user_name||'—'}</div><div class="mono">${tx.user_email||tx.user_id}</div></td>
+      <td>${statusBadge(tx.type)}</td>
+      <td>${fmt(tx.amount)}</td>
+      <td style="font-size:11px;color:#666">${tx.description||'—'}</td>
+      <td style="color:#bbb;font-size:11px">${ago(tx.created_at)}</td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No transactions</div>';
+}
+
+// ── SERVICES ──────────────────────────────────────────
+async function loadServices(){
+  const r = await api('GET','/api/admin/services');
+  if(!r.ok){ document.getElementById('services-table').innerHTML='<div class="empty">Error</div>'; return; }
+  const services = r.data;
+  document.getElementById('services-table').innerHTML = services.length ? `
+    <table><thead><tr><th>Logo</th><th>Name</th><th>API code</th><th>Provider code</th><th>Price</th><th>Provider price</th><th>Profit</th><th>Status</th><th></th></tr></thead>
+    <tbody>${services.map(s=>`<tr>
+      <td>${s.logo_url?`<img src="${s.logo_url}" style="width:24px;height:24px;object-fit:contain;border-radius:4px">`:'—'}</td>
+      <td style="font-weight:600">${s.name}</td>
+      <td class="mono">${s.api_code||s.code||'—'}</td>
+      <td class="mono">${s.provider_code||'—'}</td>
+      <td>${fmt(s.price)}</td>
+      <td>${fmt(s.provider_price)}</td>
+      <td class="profit">${fmt(s.profit)}</td>
+      <td>${statusBadge(s.is_active?'active':'inactive')}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-xs" onclick='openEditSvcModal(${JSON.stringify(s)})'><i class="ti ti-edit"></i></button>
+        <button class="btn btn-xs btn-danger" onclick="deleteService('${s._id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No services</div>';
+}
+
+function openSvcModal(svc=null){
+  const edit = !!svc;
+  openModal(edit?'Edit service':'Add service',`
+    <div class="form-row">
+      <div class="fg"><label>Name</label><input id="svc-name" value="${svc?.name||''}"></div>
+      <div class="fg"><label>API code</label><input id="svc-api" value="${svc?.api_code||svc?.code||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Provider code</label><input id="svc-prov" value="${svc?.provider_code||''}"></div>
+      <div class="fg"><label>Country code</label><input id="svc-country" value="${svc?.country_code||'22'}"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Price (₹)</label><input id="svc-price" type="number" step="0.01" value="${svc?.price||''}"></div>
+      <div class="fg"><label>Provider price (₹)</label><input id="svc-pprice" type="number" step="0.01" value="${svc?.provider_price||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Operator code</label><input id="svc-op" value="${svc?.operator_code||'1'}"></div>
+      <div class="fg"><label>Logo image</label><input id="svc-logo" type="file" accept="image/*"></div>
+    </div>
+    <div class="fg">
+      <label>Per-operator prices <span style="font-weight:400;text-transform:none;color:#bbb">(optional)</span></label>
+      <div id="svc-opprices-rows"></div>
+      <button type="button" class="btn btn-sm" onclick="addOpPriceRow()" style="width:fit-content;margin-top:2px"><i class="ti ti-plus"></i> Add operator price</button>
+    </div>
+    ${edit?`<div class="fg"><label>Active</label><select id="svc-active"><option value="true" ${svc.is_active?'selected':''}>Active</option><option value="false" ${!svc.is_active?'selected':''}>Inactive</option></select></div>`:''}
+  `,`<button class="btn btn-primary" onclick="saveSvc('${svc?._id||''}')">${edit?'Update':'Create'}</button><button class="btn" onclick="closeModal()">Cancel</button>`);
+  renderOpPriceRows(svc?.operator_prices);
+}
+
+function renderOpPriceRows(existing){
+  const wrap = document.getElementById('svc-opprices-rows');
+  wrap.innerHTML = '';
+  const entries = Object.entries(existing||{});
+  entries.forEach(([code, price]) => addOpPriceRow(code, price));
+}
+
+function addOpPriceRow(opCode='', price=''){
+  const wrap = document.getElementById('svc-opprices-rows');
+  const row = document.createElement('div');
+  row.className = 'op-price-row';
+  row.innerHTML = `
+    <select class="op-price-select">
+      ${OPERATORS.map(o=>`<option value="${o.code}" ${String(o.code)===String(opCode)?'selected':''}>${o.name}</option>`).join('')}
+    </select>
+    <input type="number" step="0.01" class="op-price-input" placeholder="Price ₹" value="${price}">
+    <button type="button" class="btn btn-xs btn-danger" onclick="this.closest('.op-price-row').remove()"><i class="ti ti-x"></i></button>
+  `;
+  wrap.appendChild(row);
+}
+
+function openEditSvcModal(svc){ openSvcModal(svc); }
+
+async function saveSvc(id){
+  const fd = new FormData();
+  fd.append('name', document.getElementById('svc-name').value);
+  fd.append('api_code', document.getElementById('svc-api').value);
+  fd.append('provider_code', document.getElementById('svc-prov').value);
+  fd.append('country_code', document.getElementById('svc-country').value);
+  fd.append('operator_code', document.getElementById('svc-op').value);
+  fd.append('price', document.getElementById('svc-price').value);
+  fd.append('provider_price', document.getElementById('svc-pprice').value);
+
+  const opPrices = {};
+  document.querySelectorAll('#svc-opprices-rows .op-price-row').forEach(row=>{
+    const code = row.querySelector('.op-price-select').value;
+    const priceVal = row.querySelector('.op-price-input').value;
+    if(priceVal !== '' && !isNaN(parseFloat(priceVal))){
+      opPrices[code] = parseFloat(priceVal);
+    }
+  });
+  fd.append('operator_prices', JSON.stringify(opPrices));
+
+  const logoFile = document.getElementById('svc-logo')?.files[0];
+  if(logoFile) fd.append('logo', logoFile);
+  if(id){
+    const active = document.getElementById('svc-active')?.value;
+    if(active) fd.append('is_active', active);
+  }
+  const r = id
+    ? await fetch(BASE+`/api/admin/services/${id}`, {method:'PUT', headers:{Authorization:'Bearer '+TOKEN}, body:fd}).then(x=>x.json().then(d=>({ok:x.ok,data:d})))
+    : await fetch(BASE+'/api/admin/services',        {method:'POST',headers:{Authorization:'Bearer '+TOKEN}, body:fd}).then(x=>x.json().then(d=>({ok:x.ok,data:d})));
+  if(r.ok){ closeModal(); loadServices(); } else alert(r.data?.error||'Error');
+}
+
+async function deleteService(id){
+  if(!confirm('Delete this service?')) return;
+  const r = await api('DELETE',`/api/admin/services/${id}`);
+  if(r.ok) loadServices(); else alert(r.data.error||'Error');
+}
+
+// ── REDEEM CODES ──────────────────────────────────────
+async function loadRedeem(page=1){
+  redeemPage=page;
+  const r = await api('GET',`/api/admin/redeem-codes?page=${page}&limit=30`);
+  if(!r.ok){ document.getElementById('redeem-table').innerHTML='<div class="empty">Error</div>'; return; }
+  const {codes,total} = r.data;
+  document.getElementById('redeem-info').textContent = `${(page-1)*30+1}–${Math.min(page*30,total)} of ${total}`;
+  document.getElementById('redeem-table').innerHTML = codes.length ? `
+    <table><thead><tr><th>Code</th><th>Amount</th><th>Used / Max</th><th>Expires</th><th>Note</th><th></th></tr></thead>
+    <tbody>${codes.map(c=>`<tr>
+      <td class="mono">${c.code}</td>
+      <td>${fmt(c.amount)}</td>
+      <td>${c.used_count||0} / ${c.max_uses??'∞'}</td>
+      <td style="font-size:11px;color:#bbb">${c.expires_at?new Date(c.expires_at).toLocaleDateString('en-IN'):'—'}</td>
+      <td style="font-size:11px;color:#888">${c.note||'—'}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-xs" onclick="navigator.clipboard.writeText('${c.code}')"><i class="ti ti-copy"></i></button>
+        <button class="btn btn-xs btn-danger" onclick="deleteRedeem('${c._id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No codes</div>';
+}
+
+function openRedeemModal(){
+  openModal('Generate redeem codes',`
+    <div class="form-row">
+      <div class="fg"><label>Amount (₹)</label><input id="rd-amount" type="number" step="0.01" placeholder="50"></div>
+      <div class="fg"><label>Number of codes</label><input id="rd-count" type="number" value="1" min="1" max="500"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Max uses per code</label><input id="rd-maxuse" type="number" value="1" min="1"></div>
+      <div class="fg"><label>Expires in (days)</label><input id="rd-exp" type="number" placeholder="30 (optional)"></div>
+    </div>
+    <div class="fg"><label>Note (optional)</label><input id="rd-note" placeholder="Campaign name…"></div>
+    <div id="rd-result" style="margin-top:8px"></div>
+  `,`<button class="btn btn-primary" onclick="generateRedeem()">Generate</button><button class="btn" onclick="closeModal()">Close</button>`);
+}
+
+async function generateRedeem(){
+  const amount = parseFloat(document.getElementById('rd-amount').value);
+  const count  = parseInt(document.getElementById('rd-count').value);
+  const max_uses = parseInt(document.getElementById('rd-maxuse').value)||1;
+  const exp = document.getElementById('rd-exp').value;
+  const note = document.getElementById('rd-note').value;
+  if(!amount||amount<=0||!count||count<1){ alert('Enter valid amount and count'); return; }
+  const r = await api('POST','/api/admin/redeem-codes',{amount,count,max_uses,note,expires_in_days:exp?parseInt(exp):null});
+  if(r.ok){
+    const codes = r.data.codes||[];
+    document.getElementById('rd-result').innerHTML = `<div class="ok-msg">${r.data.message}</div><textarea style="width:100%;font-size:11px;font-family:monospace;border:1px solid #e5e5e5;border-radius:6px;padding:8px;height:80px" readonly>${codes.join('\n')}</textarea>`;
+    loadRedeem();
+  } else { document.getElementById('rd-result').innerHTML=`<div class="err-msg">${r.data.error||'Error'}</div>`; }
+}
+
+async function deleteRedeem(id){
+  if(!confirm('Delete this code?')) return;
+  const r = await api('DELETE',`/api/admin/redeem-codes/${id}`);
+  if(r.ok) loadRedeem(redeemPage); else alert(r.data.error||'Error');
+}
+
+// ── BANNERS ───────────────────────────────────────────
+async function loadBanners(){
+  const r = await api('GET','/api/admin/banners');
+  if(!r.ok){ document.getElementById('banners-table').innerHTML='<div class="empty">Error</div>'; return; }
+  const banners = r.data.banners||[];
+  document.getElementById('banners-table').innerHTML = banners.length ? `
+    <table><thead><tr><th>Preview</th><th>Title</th><th>Subtitle</th><th>Link</th><th>Order</th><th>Active</th><th></th></tr></thead>
+    <tbody>${banners.map(b=>`<tr>
+      <td>${b.image_url?`<img src="${b.image_url}" style="width:60px;height:32px;object-fit:cover;border-radius:4px;border:1px solid #e5e5e5">`:'—'}</td>
+      <td style="font-weight:600">${b.title}</td>
+      <td style="font-size:11px;color:#888">${b.subtitle||'—'}</td>
+      <td class="mono">${b.link_url||'—'}</td>
+      <td>${b.sort_order??0}</td>
+      <td><div class="tgl ${b.is_active?'on':''}" onclick="toggleBanner('${b._id}',${!b.is_active})"></div></td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-xs" onclick='openEditBannerModal(${JSON.stringify(b)})'><i class="ti ti-edit"></i></button>
+        <button class="btn btn-xs btn-danger" onclick="deleteBanner('${b._id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No banners</div>';
+}
+
+function openBannerModal(b=null){
+  const edit=!!b;
+  openModal(edit?'Edit banner':'Add banner',`
+    <div class="form-row">
+      <div class="fg"><label>Title</label><input id="bn-title" value="${b?.title||''}"></div>
+      <div class="fg"><label>Subtitle</label><input id="bn-sub" value="${b?.subtitle||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Link URL</label><input id="bn-link" value="${b?.link_url||''}"></div>
+      <div class="fg"><label>Sort order</label><input id="bn-order" type="number" value="${b?.sort_order??0}"></div>
+    </div>
+    <div class="fg"><label>Banner image ${edit?'(optional — replaces existing)':''}</label><input id="bn-img" type="file" accept="image/*" ${edit?'':'required'}></div>
+  `,`<button class="btn btn-primary" onclick="saveBanner('${b?._id||''}')">${edit?'Update':'Upload & save'}</button><button class="btn" onclick="closeModal()">Cancel</button>`);
+}
+function openEditBannerModal(b){ openBannerModal(b); }
+
+async function saveBanner(id){
+  const fd = new FormData();
+  fd.append('title', document.getElementById('bn-title').value);
+  fd.append('subtitle', document.getElementById('bn-sub').value);
+  fd.append('link_url', document.getElementById('bn-link').value);
+  fd.append('sort_order', document.getElementById('bn-order').value||0);
+  const imgFile = document.getElementById('bn-img')?.files[0];
+  if(imgFile) fd.append('image', imgFile);
+  else if(!id){ alert('Image required'); return; }
+  const r = id
+    ? await fetch(BASE+`/api/admin/banners/${id}`,{method:'PUT',headers:{Authorization:'Bearer '+TOKEN},body:fd}).then(x=>x.json().then(d=>({ok:x.ok,data:d})))
+    : await fetch(BASE+'/api/admin/banners',     {method:'POST',headers:{Authorization:'Bearer '+TOKEN},body:fd}).then(x=>x.json().then(d=>({ok:x.ok,data:d})));
+  if(r.ok){ closeModal(); loadBanners(); } else alert(r.data?.error||'Error');
+}
+
+async function toggleBanner(id, active){
+  const fd = new FormData();
+  fd.append('is_active', active?'true':'false');
+  await fetch(BASE+`/api/admin/banners/${id}`,{method:'PUT',headers:{Authorization:'Bearer '+TOKEN},body:fd});
+  loadBanners();
+}
+
+async function deleteBanner(id){
+  if(!confirm('Delete this banner?')) return;
+  const r = await api('DELETE',`/api/admin/banners/${id}`);
+  if(r.ok) loadBanners(); else alert(r.data.error||'Error');
+}
+
+// ── SETTINGS ──────────────────────────────────────────
+async function loadSettings(){
+  const r = await api('GET','/api/admin/settings');
+  if(!r.ok) return;
+  const s = r.data;
+  document.getElementById('s-refer-reward').value = s.refer_reward??10;
+  document.getElementById('s-refer-min').value = s.refer_min_recharge??10;
+  const otp = s.multi_otp_extra||[3,2,1,1];
+  document.getElementById('s-otp2').value = otp[0]??3;
+  document.getElementById('s-otp3').value = otp[1]??2;
+  document.getElementById('s-otp4').value = otp[2]??1;
+  document.getElementById('s-otp5').value = otp[3]??1;
+  maintState = !!s.maintenance_mode;
+  const tgl = document.getElementById('maint-tgl');
+  tgl.classList.toggle('on', maintState);
+  document.getElementById('maint-label').textContent = maintState?'ON — site is under maintenance':'Off';
+}
+
+function toggleMaint(){
+  maintState = !maintState;
+  const tgl = document.getElementById('maint-tgl');
+  tgl.classList.toggle('on', maintState);
+  document.getElementById('maint-label').textContent = maintState?'ON — site is under maintenance':'Off';
+}
+
+async function saveSettings(type){
+  let body={};
+  if(type==='referral'){
+    body.refer_reward = parseFloat(document.getElementById('s-refer-reward').value);
+    body.refer_min_recharge = parseFloat(document.getElementById('s-refer-min').value);
+  } else if(type==='otp'){
+    body.multi_otp_extra = [
+      parseFloat(document.getElementById('s-otp2').value),
+      parseFloat(document.getElementById('s-otp3').value),
+      parseFloat(document.getElementById('s-otp4').value),
+      parseFloat(document.getElementById('s-otp5').value),
+    ];
+  } else if(type==='maint'){
+    body.maintenance_mode = maintState;
+  }
+  const r = await api('PUT','/api/admin/settings', body);
+  showMsg('settings-msg', r.ok?'Settings saved!':'Error: '+(r.data.error||'unknown'), r.ok);
+}
+
+// ── PROVIDER BALANCE ──────────────────────────────────
+async function loadProviderBalance(){
+  document.getElementById('provider-body').innerHTML='<div class="loading">Checking…</div>';
+  const r = await api('GET','/api/admin/provider/balance');
+  const d = r.data;
+  document.getElementById('provider-body').innerHTML = `
+    <div style="font-size:12px;color:#666;line-height:2.2">
+      <div>Provider: <b style="color:#111">Lumera SMS</b></div>
+      <div>Status: ${r.ok ? '<span class="badge b-green">Online</span>' : '<span class="badge b-red">Error</span>'}</div>
+      <div>Balance: <span style="font-size:18px;font-weight:700;color:#111">${d.balance!=null?'₹'+parseFloat(d.balance).toFixed(2):'—'}</span></div>
+      <div>Raw response: <span class="mono">${d.raw||'—'}</span></div>
+      ${d.error?`<div style="color:#991b1b">Error: ${d.error}</div>`:''}
+    </div>`;
+}
+
+// ── WALLET MODAL ──────────────────────────────────────
+function openCreditModal(uid='', name=''){
+  openModal('Wallet — add / remove balance',`
+    ${!uid?`<div class="fg"><label>User ID</label><input id="wl-uid" placeholder="Paste MongoDB _id…"></div>`:`<div style="font-size:13px;font-weight:600;margin-bottom:10px">${name}</div><input type="hidden" id="wl-uid" value="${uid}">`}
+    <div class="form-row">
+      <div class="fg"><label>Amount (₹)</label><input id="wl-amt" type="number" step="0.01" min="0.01" placeholder="50"></div>
+      <div class="fg"><label>Action</label><select id="wl-action"><option value="credit">Credit (+)</option><option value="debit">Debit (−)</option></select></div>
+    </div>
+    <div class="fg"><label>Note</label><input id="wl-note" value="Admin adjustment"></div>
+    <div id="wl-msg"></div>
+  `,`<button class="btn btn-primary" onclick="doWallet()">Apply</button><button class="btn" onclick="closeModal()">Cancel</button>`);
+}
+
+async function doWallet(){
+  const uid = document.getElementById('wl-uid').value.trim();
+  const amt = parseFloat(document.getElementById('wl-amt').value);
+  const action = document.getElementById('wl-action').value;
+  const note = document.getElementById('wl-note').value||'Admin adjustment';
+  if(!uid||!amt||amt<=0){ document.getElementById('wl-msg').innerHTML='<div class="err-msg">Fill all fields</div>'; return; }
+  const path = action==='credit' ? `/api/admin/users/${uid}/add-balance` : `/api/admin/users/${uid}/remove-balance`;
+  const r = await api('POST', path, {amount:amt, note});
+  document.getElementById('wl-msg').innerHTML = r.ok ? `<div class="ok-msg">${r.data.message}</div>` : `<div class="err-msg">${r.data.error||'Error'}</div>`;
+  if(r.ok) loadUsers(usersPage);
+}
+
+// ── TX MODAL (per user) ───────────────────────────────
+async function openTxModal(uid, name){
+  openModal(`Transactions — ${name}`, '<div class="loading">Loading…</div>', '<button class="btn" onclick="closeModal()">Close</button>');
+  const r = await api('GET', `/api/admin/users/${uid}/transactions`);
+  if(!r.ok){ document.getElementById('modal-body').innerHTML='<div class="empty">Error</div>'; return; }
+  const txs = r.data.transactions||[];
+  document.getElementById('modal-body').innerHTML = txs.length ? `
+    <table><thead><tr><th>Type</th><th>Amount</th><th>Description</th><th>When</th></tr></thead>
+    <tbody>${txs.map(tx=>`<tr>
+      <td>${statusBadge(tx.type)}</td>
+      <td>${fmt(tx.amount)}</td>
+      <td style="font-size:11px;color:#666">${tx.description||'—'}</td>
+      <td style="color:#bbb;font-size:11px">${ago(tx.created_at)}</td>
+    </tr>`).join('')}</tbody></table>` : '<div class="empty">No transactions</div>';
+}
+
+// ── MODAL HELPERS ─────────────────────────────────────
+function openModal(title, body, foot){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-foot').innerHTML = foot;
+  document.getElementById('modal-bg').style.display='flex';
+}
+function closeModal(){ document.getElementById('modal-bg').style.display='none'; }
+
+// ── INIT ──────────────────────────────────────────────
+if(TOKEN){
+  // validate token by hitting dashboard
+  api('GET','/api/admin/dashboard').then(r=>{
+    if(r.ok){ document.getElementById('sb-user').textContent='Admin'; showAdmin(); }
+    else{ TOKEN=''; localStorage.removeItem('foh_admin_token'); }
+  });
+}
+
+document.getElementById('l-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
