@@ -1450,7 +1450,7 @@ async function loadBanners() {
     const slides = document.getElementById('bannerSlides');
     const dots = document.getElementById('bannerDots');
     slides.innerHTML = banners.map(b=>`
-      <div class="banner-slide">
+      <div class="banner-slide" ${b.link_url ? `onclick="window.open('${b.link_url}','_blank')" style="cursor:pointer;"` : ''}>
         ${b.image_url?`<img src="${b.image_url}" alt="${b.title}"/>`:''}
         <div class="banner-content">
           <div class="banner-tag">Flash OTP Hub</div>
