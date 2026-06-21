@@ -1983,7 +1983,7 @@ async function saveSettings() {
   const multi_otp_extra=document.getElementById('settingMultiOtp').value.split(',').map(Number).filter(Boolean);
   const upi_id=document.getElementById('settingUpiId').value.trim();
   const maintenance_mode=document.getElementById('settingMaintenance').checked;
-  const r=await apiFetch('/api/admin/settings',{method:'POST',body:JSON.stringify({refer_reward,refer_min_recharge,multi_otp_extra,upi_id,maintenance_mode})});
+  const r=await apiFetch('/api/admin/settings',{method:'PUT',body:JSON.stringify({refer_reward,refer_min_recharge,multi_otp_extra,upi_id,maintenance_mode,default_commission})});
   if(r.ok){showToast('Settings saved');}
   else{const d=await r.json();showToast(d.error||'Failed','error');}
 }
