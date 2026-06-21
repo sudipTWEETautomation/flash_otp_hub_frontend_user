@@ -1461,7 +1461,6 @@ async function loadBanners() {
       <div class="banner-slide" ${b.link_url ? `onclick="window.open('${b.link_url}','_blank')" style="cursor:pointer;"` : ''}>
         ${b.image_url?`<img src="${b.image_url}" alt="${b.title}"/>`:''}
         <div class="banner-content">
-          <div class="banner-tag">Flash OTP Hub</div>
           <div class="banner-title">${b.title}</div>
           ${b.subtitle?`<div class="banner-sub">${b.subtitle}</div>`:''}
         </div>
