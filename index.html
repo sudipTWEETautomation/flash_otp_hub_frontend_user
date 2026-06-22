@@ -1212,54 +1212,19 @@ function scrollToServices() {
   document.getElementById('orderModal').classList.add('open');
 }
 
-function populateCountryOptions(serviceId){
+function populateCountryOptions(serviceId) {
   const sel = document.getElementById('orderCountry');
-  // oi service er sob available countries _allServices theke bero koro
-  // api_code format: `svcCode_countryCode`
-  const baseCode = serviceId ? (_allServices.find(s=>s._id===serviceId)?.provider_code || '') : '';
-  
-  // sob services filter koro jader provider_code same
-  const countryServices = _allServices.filter(s => 
-    s.provider_code === baseCode || s._id === serviceId
-  );
-
-  if(countryServices.length <= 1){
-    // single country — just India default
+  const svc = _allServices.find(s => s._id === serviceId);
+  if (!svc) {
     sel.innerHTML = '<option value="22">🇮🇳 India</option>';
+    sel.onchange = null;
     return;
   }
-
-  // unique countries
-  const seen = new Set();
-  const options = [];
-  for(const s of countryServices){
-    const cc = s.country_code || '22';
-    const cn = s.country_name || cc;
-    if(!seen.has(cc)){
-      seen.add(cc);
-      options.push({cc, cn, price: s.price, id: s._id});
-    }
-  }
-  options.sort((a,b)=>a.cn.localeCompare(b.cn));
-  sel.innerHTML = options.map(o=>
-    `<option value="${o.cc}" data-service-id="${o.id}" data-price="${o.price}">${o.cn} — ₹${parseFloat(o.price).toFixed(2)}</option>`
-  ).join('');
-
-  // country change e selected service update hobe
-  sel.onchange = function(){
-    const opt = sel.options[sel.selectedIndex];
-    const newSvcId = opt.dataset.serviceId;
-    if(newSvcId){
-      const svc = _allServices.find(s=>s._id===newSvcId);
-      if(svc){
-        selectedService.id = svc._id;
-        selectedService.price = svc.price;
-        selectedService.operator_prices = svc.operator_prices || {};
-        populateOperatorOptions();
-        updateOrderPriceForOperator();
-      }
-    }
-  };
+  const cc = svc.country_code || '22';
+  const cn = svc.country_name || 'India';
+  // Just show this service's country — no switching needed
+  sel.innerHTML = `<option value="${cc}">${cn}</option>`;
+  sel.onchange = null;
 }
   
 function populateOperatorOptions() {
