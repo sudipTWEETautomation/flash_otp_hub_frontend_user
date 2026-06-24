@@ -269,8 +269,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:60px;
 .orders-list{display:flex;flex-direction:column;gap:8px;}
 
 /* TOAST */
-.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
-.toast{background:var(--gray-800);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;animation:toastIn 0.25s ease;min-width:200px;backdrop-filter:blur(12px);}
+.toast-wrap{position:fixed;top:80px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none;} .toast{pointer-events:all;}
+.toast{background:var(--gray-900);border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px;font-size:13px;animation:toastIn 0.25s ease;min-width:280px;max-width:340px;backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
 .toast.removing{animation:toastOut 0.25s ease forwards;}
 @keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
 @keyframes toastOut{to{opacity:0;transform:translateX(20px);}}
@@ -924,9 +924,19 @@ function showToast(msg, type='success') {
   const w = document.getElementById('toastWrap');
   const t = document.createElement('div');
   t.className = `toast toast-${type}`;
-  t.textContent = msg;
+  const icon = type === 'error' ? '✕' : '✓';
+  const iconBg = type === 'error' ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.1)';
+  t.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:${iconBg};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;margin-top:1px;">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${type==='error'?'Error':'Success'}</div>
+        <div style="font-size:12px;color:var(--gray-300);line-height:1.4;">${msg}</div>
+      </div>
+      <button onclick="this.closest('.toast').remove()" style="background:none;border:none;color:var(--gray-500);font-size:16px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">✕</button>
+    </div>`;
   w.appendChild(t);
-  setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 250); }, 3000);
+  setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 250); }, 5000);
 }
 
 function copyText(text, label='Copied') {
