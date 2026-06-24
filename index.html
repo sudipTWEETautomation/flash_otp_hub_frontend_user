@@ -1373,10 +1373,11 @@ function renderSlotCard(s, prefix='slot') {
         <div class="slot-info">
           <div class="slot-icon">${s.logo ? `<img src="${s.logo}" onerror="this.style.display='none'"/>` : '📱'}</div>
           <div>
-            <div class="slot-service">${s.service}</div>
+           <div class="slot-service">${s.service}</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-top:1px;">₹${parseFloat(s.price||0).toFixed(2)}</div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <div class="slot-number">+${s.number.replace(/\D/g,'')}</div>
-              <button class="copy-btn" onclick="copyText('+${s.number.replace(/\D/g,'')}','Number')">Copy</button>
+              <div class="slot-number" style="letter-spacing:0;">+${s.number.replace(/\D/g,'').slice(-10)}</div>
+              <button class="copy-btn" onclick="copyText('+91${s.number.replace(/\D/g,'').slice(-10)}','Number')">Copy</button>
             </div>
           </div>
         </div>
