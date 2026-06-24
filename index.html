@@ -1375,7 +1375,7 @@ function renderSlotCard(s, prefix='slot') {
           <div>
             <div class="slot-service">${s.service}</div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <div class="slot-number">${s.number}</div>
+              <div class="slot-number">+${s.number.replace(/\D/g,'')}</div>
               <button class="copy-btn" onclick="copyText('${s.number}','Number')">Copy</button>
             </div>
           </div>
